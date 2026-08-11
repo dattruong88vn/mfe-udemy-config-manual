@@ -11,13 +11,13 @@ const prodConfig = {
     output: {
         filename: '[name].[contenthash].js',
         // production: sync code to S3 in folder: /container/latest
-        publicPath: '/container/latest/'
+        // publicPath: '/container/latest/'
     },
     plugins: [
         new WebpackModuleFederation({
             name: 'container',
             remotes: {
-                marketing: `marketing@${domain}/marketing/remoteEntry.js`
+                marketing: `marketing@marketing/latest/remoteEntry.js`
             },
             shared: packageJson.dependencies
         })
