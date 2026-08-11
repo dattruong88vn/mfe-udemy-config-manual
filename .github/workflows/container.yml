@@ -33,7 +33,7 @@ jobs:
         run: npm run build
 
       - name: install CLI AWS on ubuntu
-        uses: shinyinc/action-aws-cli@v1.2
+        uses: chrislennon/action-aws-cli@v1.1
 
       - name: sync code from ubuntu to AWS
         run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/container/latest
