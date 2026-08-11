@@ -11,7 +11,7 @@ const prodConfig = {
     output: {
         filename: '[name].[contenthash].js',
         // production: sync code to S3 in folder: /container/latest
-        puplicPath: '/container/latest/'
+        publicPath: '/container/latest/'
     },
     plugins: [
         new WebpackModuleFederation({
