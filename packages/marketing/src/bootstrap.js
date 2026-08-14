@@ -6,7 +6,7 @@ import App from "./App"
 
 // mount fn
 const mount = (el, { onNavigate, defaultHistory }) => {
-    const history = defaultHistory || createMemoryHistory();
+    const history = createBrowserHistory() || createMemoryHistory();
 
     if (onNavigate) {
         // execute callback each time navigate
