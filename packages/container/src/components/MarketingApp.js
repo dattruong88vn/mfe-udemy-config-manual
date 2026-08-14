@@ -6,14 +6,26 @@ export default () => {
   const ref = useRef(null);
   const history = useHistory();
 
+  /**
+   * 1. mount function: import from each child
+   * 2. params: 
+   *      - element: ReactDOM render
+   *      - object:
+   *          - initialPath: first visit or F5, parent sends current pathname to child for loading content correctly
+   *          - onNavigate: a function that parent passes down to child, child triggers it when navigate, send child current location, parent compares with current location and update to history
+   * 3. return:
+   *      - object:
+   *          - onParentNavigate: when parent navigates, triggers it and passes down current parent location to child
+   */
   useEffect(() => {
-    // mount fn import from child
-    // pass params to child: ref -> build DOM, onNavigate: sync history from child to parent
-    // mount fn return onParentNavigate, use to sync history from parent to child
-    const { onParentNavigate } = mount(ref.current, { onNavigate: ({ pathname: nextPathName }) => { const { pathname } = history.location; if (pathname !== nextPathName) { history.push(nextPathName); } } });
+    const { onParentNavigate } = mount(ref.current, { initialPath: history.location.pathname, onNavigate: ({ pathname: nextPathName }) => { const { pathname } = history.location; if (pathname !== nextPathName) { history.push(nextPathName); } } });
 
-    history.listen(onParentNavigate)
-  });
+    const unlisten = history.listen(onParentNavigate)
+
+    return () => {
+      unlisten();
+    }
+  }, []);
 
   return <div ref={ref} />;
 };

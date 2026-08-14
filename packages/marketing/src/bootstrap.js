@@ -5,12 +5,21 @@ import { createMemoryHistory, createBrowserHistory } from "history" // phải đ
 import App from "./App"
 
 // mount fn
-const mount = (el, { onNavigate, defaultHistory }) => {
-    const history = createBrowserHistory() || createMemoryHistory();
+/**
+ * 
+ * @param {*} el ReactDOM render with this element, use both development and production
+ * @param {*} initialPath parent passes down, show the current path (use for first load -> run createMemoryHistory)
+ * @param {*} onNavigate a function that parent passes down, trigger when navigate and change url on child app -> child passes current location in memory history in this function, parent uses it to update browser history
+ * @param {*} defaultHistory dynamic history between dev (Browser History) and prod (Memory History) in child app
+ * @returns function onParentNavigate, parent triggers this function with current pathname of parent when navigate, child receives latest pathname and update memory history
+ */
+
+const mount = (el, { initialPath, onNavigate, defaultHistory }) => {
+    const history = defaultHistory || createMemoryHistory({
+        initialEntries: [initialPath || '/'],
+    });;
 
     if (onNavigate) {
-        // execute callback each time navigate
-        // pass location data back to Container
         history.listen((location) => onNavigate(location))
     }
 
