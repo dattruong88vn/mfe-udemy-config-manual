@@ -15,6 +15,7 @@ defaults:
 
 jobs:
   build:
+    enviroment: production
     runs-on: ubuntu-latest
 
     steps:
