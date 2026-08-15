@@ -11,11 +11,11 @@ on:
 
 defaults:
   run:
-    environment: production
     working-directory: packages/marketing
 
 jobs:
   build:
+    environment: production
     runs-on: ubuntu-latest
 
     steps:
