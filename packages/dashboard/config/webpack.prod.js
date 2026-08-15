@@ -1,26 +1,22 @@
 const { merge } = require('webpack-merge');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackModuleFederation = require('webpack/lib/container/ModuleFederationPlugin');
 
 const packageJson = require("../package.json");
 const commonConfig = require("./webpack.common");
 
-const DOMAIN = process.env.PRODUCTION_DOMAIN;
-
 const prodConfig = {
     mode: "production",
     output: {
         filename: '[name].[contenthash].js',
-        // production: sync code to S3 in folder: /container/latest
-        // call between files in container
-        publicPath: '/container/latest/'
+        publicPath: '/dashboard/latest/' // call between files in marketing
     },
     plugins: [
         new WebpackModuleFederation({
-            name: 'container',
-            remotes: {
-                marketing: `marketing@${DOMAIN}/marketing/latest/remoteEntry.js`,
-                auth: `auth@${DOMAIN}/auth/latest/remoteEntry.js`,
-                dashboard: `dashboard@${DOMAIN}/dashboard/latest/remoteEntry.js`,
+            name: 'dashboard',
+            filename: 'remoteEntry.js',
+            exposes: {
+                './DashboardApp': './src/bootstrap.js'
             },
             shared: packageJson.dependencies
         })

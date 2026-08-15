@@ -1,0 +1,53 @@
+name: deploy-dashboard
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "packages/dashboard/**"
+      - ".github/workflows/dashboard.yml"
+
+
+defaults:
+  run:
+    working-directory: packages/dashboard
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code into ubuntu
+        uses: actions/checkout@v7
+
+      - name: install dependencies 
+        run: npm install
+
+      - name: build source code
+        run: npm run build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: sync code from ubuntu to AWS
+        run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/dashboard/latest
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        
+      - name: Invalidate CloudFront cache for remoteEntry.js
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID}} \
+            --paths "/dashboard/latest/remoteEntry.js"
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        
