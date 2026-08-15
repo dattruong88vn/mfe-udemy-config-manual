@@ -1,33 +1,33 @@
-import React from 'react';
-import { Switch, Route, BrowserRouter, MemoryRouter, Router } from 'react-router-dom';
-import {
-  StylesProvider,
-  createGenerateClassName,
-} from '@material-ui/core/styles';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Router } from 'react-router-dom';
+import { StyledEngineProvider } from '@mui/material/styles';
 
-import SignUp from './components/Signup';
-import SignIn from "./components/Signin"
-
-const generateClassName = createGenerateClassName({
-  productionPrefix: 'au',
-});
+import Signin from './components/Signin';
+import Signup from './components/Signup';
 
 export default ({ history, onSignIn }) => {
+  const [location, setLocation] = useState(history.location);
+
+  useEffect(() => {
+    // Listen to history changes and update location state
+    const unlisten = history.listen((update) => {
+      setLocation(update.location);
+    });
+
+    return unlisten; // Clean up the listener on unmount
+  }, [history]);
+
   return (
     <div>
-      <StylesProvider generateClassName={generateClassName}>
-        <Router history={history}>
-          <Switch>
-            <Route path="/auth/signin/">
-              <SignIn onSignIn={onSignIn} />
-            </Route>
-            <Route path="/auth/signup/">
-              <SignUp onSignIn={onSignIn} />
-            </Route>
-            <Route path="/" component={<div>Hi, I'm Home</div>} />
-          </Switch>
+      <StyledEngineProvider injectFirst>
+        <Router location={location} navigator={history}>
+          <Routes>
+            <Route path="/auth/signin" element={<Signin onSignIn={onSignIn} />} />
+            <Route path="/auth/signup" element={<Signup onSignIn={onSignIn} />} />
+            <Route path="/" element={<div />} />
+          </Routes>
         </Router>
-      </StylesProvider>
+      </StyledEngineProvider>
     </div>
   );
 };

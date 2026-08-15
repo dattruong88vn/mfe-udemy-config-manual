@@ -1,51 +1,50 @@
 import React, { lazy, Suspense, useState } from 'react';
-import { Switch, Route, Router, Redirect } from 'react-router-dom';
-import {
-  StylesProvider,
-  createGenerateClassName,
-} from '@material-ui/core/styles';
-import { createBrowserHistory } from "history"
+import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { StyledEngineProvider } from '@mui/material/styles';
 
-import Header from './components/Header';
 import Progress from './components/Progress';
-import { useEffect } from 'react';
+import Header from './components/Header';
 
-const DashboardAppLazy = lazy(() => import("./components/DashboardApp"));
-const MarketingAppLazy = lazy(() => import("./components/MarketingApp"));
-const AuthAppLazy = lazy(() => import("./components/AuthApp"));
+const MarketingLazy = lazy(() => import('./components/MarketingApp'));
+const AuthLazy = lazy(() => import('./components/AuthApp'));
+const DashboardLazy = lazy(() => import('./components/DashboardApp'));
 
-const generateClassName = createGenerateClassName({
-  productionPrefix: 'co',
-});
-
-const history = createBrowserHistory();
-
-export default () => {
+const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isSignedIn) {
-      history.push("/dashboard");
-    }
-  }, [isSignedIn]);
+  const handleSignIn = () => {
+    setIsSignedIn(true);
+    navigate('/dashboard');
+  };
 
   return (
-    <Router history={history}>
-      <StylesProvider generateClassName={generateClassName}>
-        <Header onSignOut={() => setIsSignedIn(false)} signedIn={isSignedIn} />
-        <Suspense fallback={<Progress />}>
-          <Switch>
-            <Route path="/auth">
-              <AuthAppLazy onSignIn={() => { setIsSignedIn(true) }} />
-            </Route>
-            <Route path="/dashboard" >
-              {!isSignedIn && <Redirect to={"/"} />}
-              <DashboardAppLazy />
-            </Route>
-            <Route path="/" component={MarketingAppLazy} />
-          </Switch>
-        </Suspense>
-      </StylesProvider>
-    </Router>
+      <StyledEngineProvider injectFirst>
+        <div>
+          <Header
+            onSignOut={() => setIsSignedIn(false)}
+            isSignedIn={isSignedIn}
+          />
+          <Suspense fallback={<Progress />}>
+            <Routes>
+              <Route path="/auth/*" element={
+                <AuthLazy onSignIn={handleSignIn} />
+              } />
+              <Route path="/dashboard" element={
+                !isSignedIn ? <Navigate to="/" /> : <DashboardLazy />
+              } />
+              <Route path="/*" element={<MarketingLazy />} />
+            </Routes>
+          </Suspense>
+        </div>
+      </StyledEngineProvider>
+  );
+};
+
+export default () => {
+  return (
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   );
 };

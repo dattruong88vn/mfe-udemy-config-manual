@@ -1,30 +1,41 @@
 const { merge } = require('webpack-merge');
-const WebpackModuleFederation = require('webpack/lib/container/ModuleFederationPlugin');
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const commonConfig = require('./webpack.common');
+const packageJson = require('../package.json');
 
-const packageJson = require("../package.json");
-const commonConfig = require("./webpack.common");
-
-const DOMAIN = process.env.PRODUCTION_DOMAIN;
+const domain = process.env.PRODUCTION_DOMAIN;
 
 const prodConfig = {
-    mode: "production",
-    output: {
-        filename: '[name].[contenthash].js',
-        // production: sync code to S3 in folder: /container/latest
-        // call between files in container
-        publicPath: '/container/latest/'
-    },
-    plugins: [
-        new WebpackModuleFederation({
-            name: 'container',
-            remotes: {
-                marketing: `marketing@${DOMAIN}/marketing/latest/remoteEntry.js`,
-                auth: `auth@${DOMAIN}/auth/latest/remoteEntry.js`,
-                dashboard: `dashboard@${DOMAIN}/dashboard/latest/remoteEntry.js`,
-            },
-            shared: packageJson.dependencies
-        })
-    ]
-}
+  mode: 'production',
+  output: {
+    filename: '[name].[contenthash].js',
+    publicPath: '/container/latest/',
+  },
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'container',
+      remotes: {
+        marketing: `marketing@${domain}/marketing/latest/remoteEntry.js`,
+        auth: `auth@${domain}/auth/latest/remoteEntry.js`,
+        dashboard: `dashboard@${domain}/dashboard/latest/remoteEntry.js`,
+      },
+      shared: {
+        ...packageJson.dependencies,
+        react: {
+          singleton: true,
+          requiredVersion: packageJson.dependencies.react,
+        },
+        'react-dom': {
+          singleton: true,
+          requiredVersion: packageJson.dependencies['react-dom'],
+        },
+        'react-router-dom': {
+          singleton: true,
+          requiredVersion: packageJson.dependencies['react-router-dom'],
+        },
+      },
+    }),
+  ],
+};
 
 module.exports = merge(commonConfig, prodConfig);

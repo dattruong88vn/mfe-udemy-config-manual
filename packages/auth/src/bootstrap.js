@@ -1,47 +1,46 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { createMemoryHistory, createBrowserHistory } from "history" // phải đổi lên react-router version cao hơn, sử dụng function của thư viện ko phải qua history
+import { createRoot } from 'react-dom/client';
+import { createMemoryHistory, createBrowserHistory } from 'history';
+import App from './App';
 
-import App from "./App"
+// Mount function to start up the app
+const mount = (el, { onSignIn, onNavigate, defaultHistory, initialPath }) => {
+  const history =
+    defaultHistory ||
+    createMemoryHistory({
+      initialEntries: [initialPath],
+    });
 
-// mount fn
-/**
- * 
- * @param {*} el ReactDOM render with this element, use both development and production
- * @param {*} initialPath parent passes down, show the current path (use for first load -> run createMemoryHistory)
- * @param {*} onNavigate a function that parent passes down, trigger when navigate and change url on child app -> child passes current location in memory history in this function, parent uses it to update browser history
- * @param {*} defaultHistory dynamic history between dev (Browser History) and prod (Memory History) in child app
- * @returns function onParentNavigate, parent triggers this function with current pathname of parent when navigate, child receives latest pathname and update memory history
- */
+  if (onNavigate) {
+    history.listen((update) => {
+      onNavigate({ pathname: update.location.pathname });
+    });
+  }
 
-const mount = (el, { initialPath, onNavigate, defaultHistory, onSignIn }) => {
-    const history = defaultHistory || createMemoryHistory({
-        initialEntries: [initialPath || '/'],
-    });;
+  const root = createRoot(el);
+  root.render(<App onSignIn={onSignIn} history={history} />);
 
-    if (onNavigate) {
-        history.listen((location) => onNavigate(location))
-    }
+  return {
+    onParentNavigate({ pathname: nextPathname }) {
+      const { pathname } = history.location;
 
-    ReactDOM.render(<App history={history} onSignIn={onSignIn} />, el);
+      if (pathname !== nextPathname) {
+        history.push(nextPathname);
+      }
+    },
+  };
+};
 
-    // return function that container trigger each time navigate
-    return {
-        onParentNavigate: ({ pathname: nextParentPathname }) => {
-            const pathname = history.location;
-
-            if (pathname !== nextParentPathname) {
-                history.push(nextParentPathname)
-            }
-        }
-    }
-}
-
-// call immediately in development mode
+// If we are in development and in isolation,
+// call mount immediately
 if (process.env.NODE_ENV === 'development') {
-    const el = document.querySelector('#my-auth-root');
-    if (el) mount(el, { defaultHistory: createBrowserHistory() })
+  const devRoot = document.querySelector('#_auth-dev-root');
+
+  if (devRoot) {
+    mount(devRoot, { defaultHistory: createBrowserHistory() });
+  }
 }
 
-// integrate with container
-export { mount }
+// We are running through container
+// and we should export the mount function
+export { mount };
