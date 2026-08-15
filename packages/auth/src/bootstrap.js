@@ -14,7 +14,7 @@ import App from "./App"
  * @returns function onParentNavigate, parent triggers this function with current pathname of parent when navigate, child receives latest pathname and update memory history
  */
 
-const mount = (el, { initialPath, onNavigate, defaultHistory }) => {
+const mount = (el, { initialPath, onNavigate, defaultHistory, onSignIn }) => {
     const history = defaultHistory || createMemoryHistory({
         initialEntries: [initialPath || '/'],
     });;
@@ -23,7 +23,7 @@ const mount = (el, { initialPath, onNavigate, defaultHistory }) => {
         history.listen((location) => onNavigate(location))
     }
 
-    ReactDOM.render(<App history={history} />, el);
+    ReactDOM.render(<App history={history} onSignIn={onSignIn} />, el);
 
     // return function that container trigger each time navigate
     return {
