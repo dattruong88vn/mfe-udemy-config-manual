@@ -1,9 +1,9 @@
-name: deploy-container
+name: deploy-new-container
 
 on:
   push:
     branches:
-      - master
+      - new-version
     paths:
       - "packages/container/**"
       - ".github/workflows/container.yml"
@@ -15,6 +15,7 @@ defaults:
 
 jobs:
   build:
+    environment: new-production
     runs-on: ubuntu-latest
 
     steps:

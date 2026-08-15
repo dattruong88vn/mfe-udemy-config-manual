@@ -1,9 +1,9 @@
-name: deploy-marketing
+name: deploy-new-marketing
 
 on:
   push:
     branches:
-      - master
+      - new-version
     paths:
       - "packages/marketing/**"
       - ".github/workflows/marketing.yml"
@@ -15,6 +15,7 @@ defaults:
 
 jobs:
   build:
+    environment: new-production
     runs-on: ubuntu-latest
 
     steps:

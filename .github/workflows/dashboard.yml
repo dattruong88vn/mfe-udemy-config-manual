@@ -1,9 +1,9 @@
-name: deploy-dashboard
+name: deploy-new-dashboard
 
 on:
   push:
     branches:
-      - master
+      - new-version
     paths:
       - "packages/dashboard/**"
       - ".github/workflows/dashboard.yml"
@@ -15,6 +15,7 @@ defaults:
 
 jobs:
   build:
+    environment: new-production
     runs-on: ubuntu-latest
 
     steps:

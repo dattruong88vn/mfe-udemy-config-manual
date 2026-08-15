@@ -1,9 +1,9 @@
-name: deploy-auth
+name: deploy-new-auth
 
 on:
   push:
     branches:
-      - master
+      - new-version
     paths:
       - "packages/auth/**"
       - ".github/workflows/auth.yml"
@@ -15,6 +15,7 @@ defaults:
 
 jobs:
   build:
+    environment: new-production
     runs-on: ubuntu-latest
 
     steps:
