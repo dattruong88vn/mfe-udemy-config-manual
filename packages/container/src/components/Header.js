@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
-import { Box } from '@mui/material';
 
 export default function Header({ isSignedIn, onSignOut }) {
   const onClick = () => {

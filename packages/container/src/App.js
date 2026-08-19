@@ -9,7 +9,7 @@ const MarketingLazy = lazy(() => import('./components/MarketingApp'));
 const AuthLazy = lazy(() => import('./components/AuthApp'));
 const DashboardLazy = lazy(() => import('./components/DashboardApp'));
 
-const App = () => {
+const AppContent = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const navigate = useNavigate();
 
@@ -19,32 +19,34 @@ const App = () => {
   };
 
   return (
-      <StyledEngineProvider injectFirst>
-        <div>
-          <Header
-            onSignOut={() => setIsSignedIn(false)}
-            isSignedIn={isSignedIn}
-          />
-          <Suspense fallback={<Progress />}>
-            <Routes>
-              <Route path="/auth/*" element={
-                <AuthLazy onSignIn={handleSignIn} />
-              } />
-              <Route path="/dashboard" element={
-                !isSignedIn ? <Navigate to="/" /> : <DashboardLazy />
-              } />
-              <Route path="/*" element={<MarketingLazy />} />
-            </Routes>
-          </Suspense>
-        </div>
-      </StyledEngineProvider>
+    <StyledEngineProvider injectFirst>
+      <div>
+        <Header
+          onSignOut={() => setIsSignedIn(false)}
+          isSignedIn={isSignedIn}
+        />
+        <Suspense fallback={<Progress />}>
+          <Routes>
+            <Route path="/auth/*" element={
+              <AuthLazy onSignIn={handleSignIn} />
+            } />
+            <Route path="/dashboard" element={
+              !isSignedIn ? <Navigate to="/" /> : <DashboardLazy />
+            } />
+            <Route path="/*" element={<MarketingLazy />} />
+          </Routes>
+        </Suspense>
+      </div>
+    </StyledEngineProvider>
   );
 };
 
-export default () => {
+const App = () => {
   return (
     <BrowserRouter>
-      <App />
+      <AppContent />
     </BrowserRouter>
   );
 };
+
+export default App

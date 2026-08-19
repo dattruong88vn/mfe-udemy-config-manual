@@ -2,10 +2,12 @@ import React from 'react';
 import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 
-export default () => {
+const Progress = () => {
   return (
     <Box sx={{ width: '100%', '& > * + *': { mt: 2 } }}>
       <LinearProgress />
     </Box>
   );
 };
+
+export default Progress

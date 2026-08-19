@@ -2,7 +2,7 @@ import { mount } from 'marketing/MarketingApp';
 import React, { useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-export default () => {
+const MarketingApp = () => {
   const ref = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,3 +29,5 @@ export default () => {
 
   return <div ref={ref} />;
 };
+
+export default MarketingApp
